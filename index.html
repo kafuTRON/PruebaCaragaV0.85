@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Industrias TKM</title>
+
+    <style>
+        /* ----------- TITULO CENTRAL ----------- */
+        .titulo-central {
+            position: absolute;
+            top: 3%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 4rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            z-index: 10;
+            pointer-events: none; /* evita que bloquee clics en los paneles */
+        }
+        /* ----------- ESTILOS GENERALES ----------- */
+        body {
+            margin: 0;
+            padding: 0;
+            background: #0e0e0e;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+
+
+        .panel h2 {
+            position: absolute;
+            bottom: 40px;
+            left: 40px;
+            color: white;
+            font-size: 2.5rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* ----------- CONTENEDOR PRINCIPAL ----------- */
+        .contenedor {
+            display: flex;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* ----------- CADA PANEL ----------- */
+        .panel {
+            position: relative;
+            flex: 1;
+            overflow: hidden;
+            transition: flex 0.5s ease;
+            cursor: pointer;
+        }
+
+        .panel:hover {
+            flex: 2;
+        }
+
+        /* Imagen */
+        .panel img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+            filter: brightness(0.7);
+        }
+
+        .panel:hover img {
+            transform: scale(1.1);
+            filter: brightness(1);
+        }
+
+        /* Oscurecer un poco */
+        .panel::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(0,0,0,0.7));
+        }
+
+
+
+        /* ----------- SECCIÓN NOVEDADES ----------- */
+        .seccion-novedades {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            padding: 60px 0 60px 0;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .novedades-titulo {
+            text-align: center;
+            color: #ff6b35;
+            font-size: 3rem;
+            margin: 0 auto 60px auto;
+            padding: 40px 20px 0 20px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            max-width: 1200px;
+            font-weight: bold;
+        }
+
+
+
+        .novedades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto 40px auto;
+        }
+
+        .novedad-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .novedad-item:hover {
+            transform: translateY(-10px);
+        }
+
+        .novedad-item img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+        }
+
+        .novedad-content {
+            padding: 20px;
+            color: white;
+        }
+
+        .novedad-titulo {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: #ff6b35;
+        }
+
+        .novedad-descripcion {
+            font-size: 0.9rem;
+            line-height: 1.5;
+            opacity: 0.8;
+        }
+
+        /* ----------- VIDEOS TIKTOK ----------- */
+        .videos-section {
+            margin-top: 40px;
+            padding: 20px 0 60px 0;
+        }
+
+        .videos-titulo {
+            text-align: center;
+            color: #ff6b35;
+            font-size: 2.5rem;
+            margin: 0 auto 50px auto;
+            padding: 20px 20px 0 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            max-width: 1200px;
+            font-weight: bold;
+        }
+
+        .videos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .video-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+        
+        /* Spinner de carga para TikTok */
+        .loading-spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Mensaje de error para TikTok */
+        .tiktok-error {
+            text-align: center;
+            color: #ff6b35;
+            padding: 40px;
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+
+        /* ===== ESTILOS MÓVILES - CARRUSEL ===== */
+        .mobile-carousel-container {
+            display: none; /* Oculto por defecto, se muestra en móviles */
+            position: relative; /* Cambiado de fixed a relative */
+            width: 100%;
+            height: 100vh;
+            z-index: 10;
+            background: #0e0e0e;
+        }
+
+        .mobile-header {
+            position: absolute; /* Cambiado de fixed a absolute */
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(14, 14, 14, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 1rem;
+            text-align: center;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 107, 53, 0.3);
+        }
+
+        .mobile-header h1 {
+            font-size: 1.5rem;
+            color: #ff6b35;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .carousel-container {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+            margin-top: 0;
+        }
+
+        .carousel-wrapper {
+            display: flex;
+            height: 100%;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            will-change: transform;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            height: 100%;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .slide-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            filter: brightness(0.6);
+            transition: all 0.3s ease;
+        }
+
+        .carousel-slide:active .slide-background {
+            filter: brightness(0.8);
+            transform: scale(1.05);
+        }
+
+        .slide-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                135deg,
+                rgba(0, 0, 0, 0.4) 0%,
+                rgba(255, 107, 53, 0.2) 50%,
+                rgba(0, 0, 0, 0.6) 100%
+            );
+        }
+
+        .slide-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem;
+            max-width: 90%;
+        }
+
+        .slide-icon {
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 107, 53, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .slide-icon img {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: brightness(1.2);
+        }
+
+        .carousel-slide:active .slide-icon {
+            transform: scale(0.95);
+            background: rgba(255, 107, 53, 0.2);
+        }
+
+        .slide-title {
+            font-size: 1.8rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            line-height: 1.2;
+        }
+
+        .slide-description {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.5;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .slide-cta {
+            margin-top: 2rem;
+            padding: 12px 30px;
+            background: linear-gradient(45deg, #ff6b35, #f7931e);
+            color: white;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .slide-cta:active {
+            transform: scale(0.95);
+        }
+
+        .carousel-controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 20;
+        }
+        
+        /* Indicador de scroll para móviles */
+        .scroll-indicator {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8rem;
+            text-align: center;
+            z-index: 25;
+            animation: bounce 2s infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
+            40% { transform: translateX(-50%) translateY(-10px); }
+            60% { transform: translateX(-50%) translateY(-5px); }
+        }
+
+        .carousel-nav-btn {
+            width: 50px;
+            height: 50px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 107, 53, 0.3);
+            border-radius: 50%;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .carousel-nav-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 107, 53, 0.3);
+        }
+
+        .carousel-indicators {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .indicator.active {
+            background: #ff6b35;
+            transform: scale(1.2);
+        }
+
+        .swipe-hint {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 107, 53, 0.9);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 30;
+            pointer-events: none;
+        }
+
+        .swipe-hint.left {
+            left: 20px;
+        }
+
+        .swipe-hint.right {
+            right: 20px;
+        }
+
+        .swipe-hint.show {
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Responsive para móviles */
+        @media (max-width: 768px) {
+            /* Asegurar que el contenido sea scrolleable en móviles */
+            body {
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+            
+            /* Ajustar secciones para móviles */
+            .seccion-novedades {
+                padding: 40px 20px;
+                min-height: auto;
+            }
+            
+            .novedades-titulo {
+                font-size: 2rem;
+                margin-bottom: 30px;
+                padding: 20px 10px 0;
+            }
+            
+            .novedades-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 0 10px;
+            }
+            
+            .novedad-item {
+                margin: 0 auto;
+                max-width: 350px;
+            }
+            
+            .videos-titulo {
+                font-size: 1.8rem;
+                margin-bottom: 30px;
+            }
+            
+            .videos-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 0 10px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .slide-title {
+                font-size: 1.5rem;
+            }
+            
+            .slide-description {
+                font-size: 0.9rem;
+            }
+            
+            .slide-icon {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .slide-icon img {
+                width: 60px;
+                height: 60px;
+            }
+            
+            .carousel-nav-btn {
+                width: 45px;
+                height: 45px;
+                font-size: 1rem;
+            }
+            
+            .novedades-titulo {
+                font-size: 1.6rem;
+            }
+            
+            .videos-titulo {
+                font-size: 1.5rem;
+            }
+        }
+
+        /* Safe Area para iPhone X+ */
+        @supports (padding: max(0px)) {
+            .mobile-header {
+                padding-top: max(1rem, env(safe-area-inset-top));
+                padding-left: max(1rem, env(safe-area-inset-left));
+                padding-right: max(1rem, env(safe-area-inset-right));
+            }
+            
+            .carousel-controls {
+                bottom: max(30px, env(safe-area-inset-bottom));
+            }
+        }
+
+        /* ----------- SECCIÓN REDES SOCIALES ----------- */
+        .redes-sociales-section {
+            background: linear-gradient(135deg, #1a1a1a, #2d2d2d);
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .section-titulo {
+            font-size: 2.5rem;
+            color: #ffd700;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .section-subtitulo {
+            font-size: 1.2rem;
+            color: #ccc;
+            margin-bottom: 3rem;
+        }
+
+        .redes-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .red-social-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .red-social-card:hover {
+            transform: translateY(-10px);
+            border-color: rgba(255, 215, 0, 0.6);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .red-icon {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .red-social-card h3 {
+            font-size: 1.5rem;
+            margin: 0;
+            color: #ffd700;
+        }
+
+        .red-social-card p {
+            margin: 0;
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+
+        .red-badge {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1e1e1e;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .red-social-card.tiktok:hover { border-color: #ff0050; }
+        .red-social-card.whatsapp:hover { border-color: #25D366; }
+        .red-social-card.facebook:hover { border-color: #1877F2; }
+        .red-social-card.instagram:hover { border-color: #E4405F; }
+
+        /* ----------- SECCIÓN UBICACIÓN ----------- */
+        .ubicacion-section {
+            background: linear-gradient(135deg, #0e0e0e, #1a1a1a);
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .map-container-index {
+            max-width: 1200px;
+            margin: 3rem auto;
+            padding: 0 20px;
+        }
+
+        .tiendas-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            margin: 3rem auto 0;
+            padding: 0 20px;
+        }
+
+        .tienda-info-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 215, 0, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .tienda-info-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 215, 0, 0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .tienda-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 6px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .tienda-badge.principal {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1e1e1e;
+        }
+
+        .tienda-info-card h3 {
+            color: #ffd700;
+            font-size: 1.5rem;
+            margin: 0 0 1rem 0;
+        }
+
+        .tienda-info-card p {
+            color: #ccc;
+            margin: 0.5rem 0;
+            line-height: 1.6;
+        }
+
+        .tienda-info-card strong {
+            color: #ffd700;
+        }
+
+        .tienda-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-tienda {
+            flex: 1;
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            color: #ffd700;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-tienda:hover {
+            background: rgba(255, 215, 0, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-tienda.whatsapp {
+            background: rgba(37, 211, 102, 0.1);
+            border-color: rgba(37, 211, 102, 0.3);
+            color: #25D366;
+        }
+
+        .btn-tienda.whatsapp:hover {
+            background: rgba(37, 211, 102, 0.2);
+        }
+
+        .btn-ver-todas-tiendas {
+            display: inline-block;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1e1e1e;
+            padding: 15px 40px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-ver-todas-tiendas:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        /* Responsive para nuevas secciones */
+        @media (max-width: 768px) {
+            .section-titulo {
+                font-size: 1.8rem;
+            }
+
+            .section-subtitulo {
+                font-size: 1rem;
+            }
+
+            .redes-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .tiendas-info-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+
+            .tienda-actions {
+                flex-direction: column;
+            }
+
+            .btn-tienda {
+                width: 100%;
+            }
+        }
+
+    </style>
+</head>
+<body>
+<h1 class="titulo-central">Industrias TKM</h1>
+    <div class="contenedor">
+
+        <!-- PANEL 1 -->
+        <div class="panel" onclick="irA('recursos/M&M.html')">
+            <img src="recursos/M&M/M&M.png">
+            <h2>Servicios de instalacion de camaras</h2>
+        </div>
+
+        <!-- PANEL 2 -->
+        <div class="panel" onclick="irA('A&A.html')">
+            <img src="recursos/A&A/A&A.png">
+            <h2>Perfumeria de la pareja perfecta</h2>
+        </div>
+
+        <!-- PANEL 3 -->
+        <div class="panel" onclick="irA('recursos/CDL.html')">
+            <img src="recursos/CDL/CDL.png">
+            <h2>Casa de la Limpieza Productos de limpieza</h2>
+        </div>
+
+    </div>
+
+
+
+    <!-- SECCIÓN NOVEDADES -->
+    <div class="seccion-novedades" id="novedades">
+        <h2 class="novedades-titulo">🌟 Novedades Industrias TKM 🌟</h2>
+        
+        <div class="novedades-grid">
+            <div class="novedad-item">
+                <img src="recursos/A&A/Material Grafico/CartelonDamayCabellero.jpg" alt="Perfumes para Dama y Caballero">
+                <div class="novedad-content">
+                    <h3 class="novedad-titulo">Nueva Colección A&A</h3>
+                    <p class="novedad-descripcion">Descubre nuestra exclusiva línea de perfumes inspirados para dama y caballero. Fragancias únicas que definen tu personalidad.</p>
+                </div>
+            </div>
+
+            <div class="novedad-item">
+                <img src="recursos/A&A/Material Grafico/CartelonDePerdumesInspirados.jpg" alt="Perfumes Inspirados">
+                <div class="novedad-content">
+                    <h3 class="novedad-titulo">Perfumes Inspirados</h3>
+                    <p class="novedad-descripcion">Experimenta la elegancia con nuestros perfumes inspirados en las mejores fragancias del mundo. Calidad premium a precios accesibles.</p>
+                </div>
+            </div>
+
+            <div class="novedad-item">
+                <img src="recursos/A&A/Material Grafico/CartelonMarcoPerfume.jpg" alt="Marco Perfume">
+                <div class="novedad-content">
+                    <h3 class="novedad-titulo">Presentación Exclusiva</h3>
+                    <p class="novedad-descripcion">Nuevos diseños de presentación para nuestros productos. Perfectos para regalar o para consentirte.</p>
+                </div>
+            </div>
+
+            <div class="novedad-item">
+                <img src="recursos/A&A/Material Grafico/VistaProductoConContactos.jpg" alt="Contacto Directo">
+                <div class="novedad-content">
+                    <h3 class="novedad-titulo">Atención Personalizada</h3>
+                    <p class="novedad-descripcion">Contáctanos directamente para asesoría personalizada. Estamos aquí para ayudarte a encontrar tu fragancia perfecta.</p>
+                </div>
+            </div>
+
+            <div class="novedad-item">
+                <img src="recursos/A&A/Material Grafico/ParonamaDeLogoConRedesSociales.jpg" alt="Redes Sociales">
+                <div class="novedad-content">
+                    <h3 class="novedad-titulo">Síguenos en Redes</h3>
+                    <p class="novedad-descripcion">Mantente al día con todas nuestras novedades, promociones y tips de belleza en nuestras redes sociales.</p>
+                </div>
+            </div>
+
+            <div class="novedad-item">
+                <img src="recursos/A&A/Material Grafico/CartelonDeUbicacionVariante1.jpg" alt="Ubicación">
+                <div class="novedad-content">
+                    <h3 class="novedad-titulo">Visítanos</h3>
+                    <p class="novedad-descripcion">Conoce nuestras instalaciones y experimenta nuestros productos de primera mano. Te esperamos con los brazos abiertos.</p>
+                </div>
+            </div>
+        </div>
+
+
+
+        <!-- SECCIÓN VIDEOS TIKTOK -->
+        <div class="videos-section">
+            <h2 class="videos-titulo">📱 Síguenos en TikTok 📱</h2>
+            <div class="videos-grid" id="tiktokVideos">
+                <!-- Los videos se cargarán dinámicamente aquí -->
+            </div>
+            
+            <!-- Botón para cargar más videos -->
+            <div style="text-align: center; margin-top: 40px;">
+                <button onclick="tiktokManager.cargarVideosAleatorios()" class="btn-cargar-videos" style="background: linear-gradient(45deg, #ff6b35, #f7931e); color: white; padding: 12px 24px; border: none; border-radius: 25px; font-size: 1rem; cursor: pointer; transition: transform 0.3s ease;">
+                    🔄 Cargar Más Videos
+                </button>
+            </div>
+        </div>
+
+        <!-- SECCIÓN REDES SOCIALES -->
+        <div class="redes-sociales-section">
+            <h2 class="section-titulo">🌟 Síguenos en Redes Sociales 🌟</h2>
+            <p class="section-subtitulo">Mantente conectado con nosotros y descubre nuestras últimas novedades</p>
+            
+            <div class="redes-grid">
+                <a href="https://www.tiktok.com/@aa.perfumes7" target="_blank" class="red-social-card tiktok">
+                    <div class="red-icon">📱</div>
+                    <h3>TikTok</h3>
+                    <p>@aa.perfumes7</p>
+                    <span class="red-badge">Síguenos</span>
+                </a>
+                
+                <a href="https://wa.me/2721224946" target="_blank" class="red-social-card whatsapp">
+                    <div class="red-icon">💬</div>
+                    <h3>WhatsApp</h3>
+                    <p>272 122 4946</p>
+                    <span class="red-badge">Contáctanos</span>
+                </a>
+                
+                <a href="https://www.facebook.com/industriastkm" target="_blank" class="red-social-card facebook">
+                    <div class="red-icon">👍</div>
+                    <h3>Facebook</h3>
+                    <p>Industrias TKM</p>
+                    <span class="red-badge">Síguenos</span>
+                </a>
+                
+                <a href="https://www.instagram.com/industriastkm" target="_blank" class="red-social-card instagram">
+                    <div class="red-icon">📸</div>
+                    <h3>Instagram</h3>
+                    <p>@industriastkm</p>
+                    <span class="red-badge">Síguenos</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- SECCIÓN UBICACIÓN -->
+        <div class="ubicacion-section">
+            <h2 class="section-titulo">📍 Encuéntranos 📍</h2>
+            <p class="section-subtitulo">Visita nuestras sucursales en Orizaba, Veracruz</p>
+            
+            <!-- Mapa -->
+            <div class="map-container-index">
+                <div id="map" style="width: 100%; height: 400px; border-radius: 15px; border: 2px solid rgba(255, 215, 0, 0.3);"></div>
+            </div>
+            
+            <!-- Información de tiendas -->
+            <div class="tiendas-info-grid">
+                <div class="tienda-info-card">
+                    <div class="tienda-badge principal">⭐ Sucursal Principal</div>
+                    <h3>Industrias TKM</h3>
+                    <p><strong>📍</strong> Prol. de Nte. 8, UNE, 94310 Orizaba, Ver.</p>
+                    <p><strong>📞</strong> 272 122 4946 | 272 723 1605</p>
+                    <p><strong>🕐</strong> Lun-Sáb: 9:00 AM - 6:00 PM<br>Dom: 8:00 AM - 5:00 PM</p>
+                    <p><strong>🛍️</strong> A&A Perfumes | M&M Limpieza | CDL Accesorios</p>
+                    <div class="tienda-actions">
+                        <button onclick="mapsManager && mapsManager.focusStore(1)" class="btn-tienda">Ver en mapa</button>
+                        <a href="https://maps.app.goo.gl/TNDWQqaApHguUMki9" target="_blank" class="btn-tienda">📍 Google Maps</a>
+                        <a href="https://wa.me/2721224946" target="_blank" class="btn-tienda whatsapp">WhatsApp</a>
+                    </div>
+                </div>
+                
+                <div class="tienda-info-card">
+                    <div class="tienda-badge">📍 Sucursal 2</div>
+                    <h3>Industrias TKM</h3>
+                    <p><strong>📍</strong> Oriente 3, Nte. 10, 94300 Orizaba, Ver.</p>
+                    <p><strong>📞</strong> 272 122 4946 | 272 723 1605</p>
+                    <p><strong>🕐</strong> Lun-Sáb: 9:00 AM - 6:00 PM<br>Dom: 8:00 AM - 5:00 PM</p>
+                    <p><strong>🛍️</strong> A&A Perfumes | M&M Limpieza</p>
+                    <div class="tienda-actions">
+                        <button onclick="mapsManager && mapsManager.focusStore(2)" class="btn-tienda">Ver en mapa</button>
+                        <a href="https://maps.app.goo.gl/KiqtnECpPwBTSVFL7" target="_blank" class="btn-tienda">📍 Google Maps</a>
+                        <a href="https://wa.me/2721224946" target="_blank" class="btn-tienda whatsapp">WhatsApp</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 30px;">
+                <a href="ubicaciones.html" class="btn-ver-todas-tiendas">
+                    🗺️ Ver Mapa Completo
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- CSS para las nuevas secciones -->
+    <link rel="stylesheet" href="css/APIs/google-maps.css">
+    
+    <!-- Scripts de TikTok -->
+    <script async src="https://www.tiktok.com/embed.js"></script>
+    <script src="js/Index/tiktok.js"></script>
+    
+    <!-- Scripts de Google Maps -->
+    <script src="js/APIs/config-apis.js"></script>
+    <script src="js/APIs/google-maps.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBvAGWgDrMBF7GqLxWQZgs2BD2K2Yhn6L0&callback=initGoogleMaps" async defer></script>
+    
+    <script>
+        // ===== DETECCIÓN DE DISPOSITIVO MÓVIL =====
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                   window.innerWidth <= 768;
+        }
+
+        // ===== REDIRECCIÓN AUTOMÁTICA A VERSIÓN MÓVIL =====
+        function checkMobileRedirect() {
+            if (isMobileDevice()) {
+                console.log('📱 Dispositivo móvil detectado - Cargando versión carrusel');
+                // Mostrar versión móvil inline en lugar de redireccionar
+                showMobileVersion();
+                return true;
+            }
+            console.log('🖥️ Desktop detectado - Mostrando versión original');
+            return false;
+        }
+
+        // ===== MOSTRAR VERSIÓN MÓVIL INLINE =====
+        function showMobileVersion() {
+            // Ocultar versión desktop de los paneles principales
+            document.querySelector('.contenedor').style.display = 'none';
+            document.querySelector('.titulo-central').style.display = 'none';
+            
+            // Crear y mostrar versión móvil
+            createMobileCarousel();
+            
+            // Asegurar que el resto del contenido sea visible
+            const seccionNovedades = document.querySelector('.seccion-novedades');
+            if (seccionNovedades) {
+                seccionNovedades.style.display = 'block';
+                seccionNovedades.style.marginTop = '0';
+            }
+            
+            // Permitir scroll en el body
+            document.body.style.overflow = 'auto';
+            document.body.style.overflowX = 'hidden';
+        }
+
+        function irA(url) {
+            // Si es móvil y va a A&A, usar la versión ultra-optimizada
+            if (isMobileDevice() && url === 'A&A.html') {
+                window.location.href = 'A&A-mobile-ultra.html';
+            } else {
+                window.location.href = url;
+            }
+        }
+
+        // ===== CREAR CARRUSEL MÓVIL =====
+        function createMobileCarousel() {
+            const mobileContainer = document.createElement('div');
+            mobileContainer.className = 'mobile-carousel-container';
+            mobileContainer.style.display = 'block';
+            
+            mobileContainer.innerHTML = `
+                <!-- Header Móvil -->
+                <div class="mobile-header">
+                    <h1>Industrias TKM</h1>
+                </div>
+
+                <!-- Carrusel Principal -->
+                <div class="carousel-container" id="carousel">
+                    <div class="carousel-wrapper" id="carouselWrapper">
+                        <!-- Slide 1: M&M -->
+                        <div class="carousel-slide" data-url="recursos/M&M.html">
+                            <div class="slide-background" style="background-image: url('recursos/M&M/M&M.png')"></div>
+                            <div class="slide-overlay"></div>
+                            <div class="slide-content">
+                                <div class="slide-icon">
+                                    <img src="recursos/M&M/M&M.png" alt="M&M">
+                                </div>
+                                <h2 class="slide-title">Servicios de Instalación</h2>
+                                <p class="slide-description">Cámaras de seguridad profesionales para proteger lo que más importa</p>
+                                <button class="slide-cta">Ver Servicios</button>
+                            </div>
+                        </div>
+
+                        <!-- Slide 2: A&A -->
+                        <div class="carousel-slide" data-url="A&A-mobile-ultra.html">
+                            <div class="slide-background" style="background-image: url('recursos/A&A/A&A.png')"></div>
+                            <div class="slide-overlay"></div>
+                            <div class="slide-content">
+                                <div class="slide-icon">
+                                    <img src="recursos/A&A/A&A.png" alt="A&A">
+                                </div>
+                                <h2 class="slide-title">Perfumería A&A</h2>
+                                <p class="slide-description">Fragancias inspiradas en los más populares, creadas con amor para la pareja perfecta</p>
+                                <button class="slide-cta">Ver Perfumes</button>
+                            </div>
+                        </div>
+
+                        <!-- Slide 3: CDL -->
+                        <div class="carousel-slide" data-url="recursos/CDL.html">
+                            <div class="slide-background" style="background-image: url('recursos/CDL/CDL.png')"></div>
+                            <div class="slide-overlay"></div>
+                            <div class="slide-content">
+                                <div class="slide-icon">
+                                    <img src="recursos/CDL/CDL.png" alt="CDL">
+                                </div>
+                                <h2 class="slide-title">Casa de la Limpieza</h2>
+                                <p class="slide-description">Productos de limpieza de alta calidad para mantener tu hogar impecable</p>
+                                <button class="slide-cta">Ver Productos</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Controles del Carrusel -->
+                    <div class="carousel-controls">
+                        <button class="carousel-nav-btn" id="prevBtn">‹</button>
+                        <div class="carousel-indicators" id="indicators">
+                            <div class="indicator active" data-slide="0"></div>
+                            <div class="indicator" data-slide="1"></div>
+                            <div class="indicator" data-slide="2"></div>
+                        </div>
+                        <button class="carousel-nav-btn" id="nextBtn">›</button>
+                    </div>
+
+                    <!-- Indicadores de Swipe -->
+                    <div class="swipe-hint left" id="swipeLeft">← Desliza</div>
+                    <div class="swipe-hint right" id="swipeRight">Desliza →</div>
+                    
+                    <!-- Indicador de Scroll -->
+                    <div class="scroll-indicator">
+                        ↓ Desliza hacia abajo para ver más ↓
+                    </div>
+                </div>
+            `;
+            
+            // Insertar el carrusel al principio del body, antes de todo el contenido existente
+            const firstElement = document.body.firstElementChild;
+            document.body.insertBefore(mobileContainer, firstElement);
+            
+            // Cargar funcionalidades avanzadas
+            loadMobileAdvancedFeatures();
+            
+            // Inicializar carrusel después de agregar al DOM
+            setTimeout(() => {
+                new MobileCarousel();
+            }, 100);
+        }
+
+        // ===== CLASE CARRUSEL MÓVIL =====
+        class MobileCarousel {
+            constructor() {
+                this.currentSlide = 0;
+                this.totalSlides = 3;
+                this.isTransitioning = false;
+                this.autoPlayInterval = null;
+                this.touchStartX = 0;
+                this.touchEndX = 0;
+                this.touchStartY = 0;
+                this.touchEndY = 0;
+                this.minSwipeDistance = 50;
+                
+                this.wrapper = document.getElementById('carouselWrapper');
+                this.indicators = document.querySelectorAll('.indicator');
+                this.prevBtn = document.getElementById('prevBtn');
+                this.nextBtn = document.getElementById('nextBtn');
+                this.swipeLeftHint = document.getElementById('swipeLeft');
+                this.swipeRightHint = document.getElementById('swipeRight');
+                
+                this.init();
+            }
+            
+            init() {
+                this.setupEventListeners();
+                this.setupAutoPlay();
+                this.showSwipeHints();
+                console.log('🎠 Carrusel móvil inicializado');
+            }
+            
+            setupEventListeners() {
+                // Botones de navegación
+                this.prevBtn.addEventListener('click', () => this.prevSlide());
+                this.nextBtn.addEventListener('click', () => this.nextSlide());
+                
+                // Indicadores
+                this.indicators.forEach((indicator, index) => {
+                    indicator.addEventListener('click', () => this.goToSlide(index));
+                });
+                
+                // Touch events
+                this.wrapper.addEventListener('touchstart', (e) => this.handleTouchStart(e), { passive: true });
+                this.wrapper.addEventListener('touchmove', (e) => this.handleTouchMove(e), { passive: false });
+                this.wrapper.addEventListener('touchend', (e) => this.handleTouchEnd(e), { passive: true });
+                
+                // Click en slides
+                document.querySelectorAll('.carousel-slide').forEach((slide, index) => {
+                    slide.addEventListener('click', () => this.handleSlideClick(slide));
+                });
+            }
+            
+            handleTouchStart(e) {
+                this.touchStartX = e.touches[0].clientX;
+                this.touchStartY = e.touches[0].clientY;
+                this.pauseAutoPlay();
+            }
+            
+            handleTouchMove(e) {
+                const deltaX = Math.abs(e.touches[0].clientX - this.touchStartX);
+                const deltaY = Math.abs(e.touches[0].clientY - this.touchStartY);
+                
+                if (deltaX > deltaY) {
+                    e.preventDefault();
+                }
+            }
+            
+            handleTouchEnd(e) {
+                this.touchEndX = e.changedTouches[0].clientX;
+                this.touchEndY = e.changedTouches[0].clientY;
+                
+                const deltaX = this.touchEndX - this.touchStartX;
+                const deltaY = Math.abs(this.touchEndY - this.touchStartY);
+                
+                if (Math.abs(deltaX) > deltaY && Math.abs(deltaX) > this.minSwipeDistance) {
+                    if (deltaX > 0) {
+                        this.prevSlide();
+                        this.showSwipeHint('left');
+                    } else {
+                        this.nextSlide();
+                        this.showSwipeHint('right');
+                    }
+                }
+                
+                this.resumeAutoPlay();
+            }
+            
+            prevSlide() {
+                if (this.isTransitioning) return;
+                
+                // Feedback avanzado si está disponible
+                if (window.MobileAdvanced) {
+                    MobileAdvanced.playSound('swipe');
+                    MobileAdvanced.vibrate('light');
+                }
+                
+                this.currentSlide = this.currentSlide === 0 ? this.totalSlides - 1 : this.currentSlide - 1;
+                this.updateCarousel();
+            }
+            
+            nextSlide() {
+                if (this.isTransitioning) return;
+                
+                // Feedback avanzado si está disponible
+                if (window.MobileAdvanced) {
+                    MobileAdvanced.playSound('swipe');
+                    MobileAdvanced.vibrate('light');
+                }
+                
+                this.currentSlide = this.currentSlide === this.totalSlides - 1 ? 0 : this.currentSlide + 1;
+                this.updateCarousel();
+            }
+            
+            goToSlide(index) {
+                if (this.isTransitioning || index === this.currentSlide) return;
+                this.currentSlide = index;
+                this.updateCarousel();
+            }
+            
+            updateCarousel() {
+                this.isTransitioning = true;
+                
+                const translateX = -this.currentSlide * 100;
+                this.wrapper.style.transform = `translateX(${translateX}%)`;
+                
+                this.indicators.forEach((indicator, index) => {
+                    indicator.classList.toggle('active', index === this.currentSlide);
+                });
+                
+                setTimeout(() => {
+                    this.isTransitioning = false;
+                }, 300);
+            }
+            
+            handleSlideClick(slide) {
+                const url = slide.dataset.url;
+                if (url) {
+                    // Feedback avanzado si está disponible
+                    if (window.MobileAdvanced) {
+                        MobileAdvanced.playSound('click');
+                        MobileAdvanced.vibrate('medium');
+                    }
+                    
+                    slide.style.transform = 'scale(0.98)';
+                    setTimeout(() => {
+                        slide.style.transform = '';
+                        window.location.href = url;
+                    }, 150);
+                }
+            }
+            
+            showSwipeHint(direction) {
+                const hint = direction === 'left' ? this.swipeLeftHint : this.swipeRightHint;
+                hint.classList.add('show');
+                setTimeout(() => {
+                    hint.classList.remove('show');
+                }, 1000);
+            }
+            
+            showSwipeHints() {
+                setTimeout(() => {
+                    this.showSwipeHint('right');
+                    setTimeout(() => {
+                        this.showSwipeHint('left');
+                    }, 1500);
+                }, 2000);
+            }
+            
+            setupAutoPlay() {
+                this.autoPlayInterval = setInterval(() => {
+                    this.nextSlide();
+                }, 5000);
+            }
+            
+            pauseAutoPlay() {
+                if (this.autoPlayInterval) {
+                    clearInterval(this.autoPlayInterval);
+                    this.autoPlayInterval = null;
+                }
+            }
+            
+            resumeAutoPlay() {
+                if (!this.autoPlayInterval) {
+                    this.setupAutoPlay();
+                }
+            }
+        }
+
+        // Los videos de TikTok se manejan ahora desde js/tiktok.js
+
+        // ===== CARGAR FUNCIONALIDADES AVANZADAS =====
+        function loadMobileAdvancedFeatures() {
+            const script = document.createElement('script');
+            script.src = 'js/mobile-advanced-features.js';
+            script.async = true;
+            script.onload = () => {
+                console.log('🚀 Funcionalidades avanzadas cargadas en carrusel');
+                
+                // Configurar música de bienvenida
+                setTimeout(() => {
+                    if (window.MobileAdvanced) {
+                        // Iniciar música después de la primera interacción
+                        document.addEventListener('touchstart', () => {
+                            MobileAdvanced.playMusic('main', true);
+                        }, { once: true });
+                    }
+                }, 1000);
+            };
+            script.onerror = () => {
+                console.warn('⚠️ Funcionalidades avanzadas no disponibles en carrusel');
+            };
+            document.head.appendChild(script);
+        }
+
+        // ===== INICIALIZACIÓN PRINCIPAL =====
+        document.addEventListener('DOMContentLoaded', function() {
+            // Verificar si debe mostrar versión móvil
+            if (!checkMobileRedirect()) {
+                // Si es desktop, cargar videos normalmente
+                // Los videos se cargarán automáticamente con lazy loading
+            }
+        });
+
+        // También cargar cuando se hace scroll a la sección
+        window.addEventListener('scroll', function() {
+            const videosSection = document.querySelector('.videos-section');
+            const rect = videosSection.getBoundingClientRect();
+            
+            if (rect.top < window.innerHeight && rect.bottom > 0) {
+                // La sección está visible, asegurar que los videos estén cargados
+                // Los videos se cargan automáticamente con el tiktokManager
+            }
+        });
+    </script>
+
+</body>
+</html>

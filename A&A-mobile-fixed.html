@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#ffd700">
+    <title>A&A Perfumería - Móvil (Arreglado)</title>
+    
+    <style>
+        /* CSS Crítico Simplificado */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+            color: white;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            position: sticky;
+            top: 0;
+            background: rgba(30, 30, 30, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 1rem;
+            text-align: center;
+            z-index: 100;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 0.3rem;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+        
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+        }
+        
+        .nav-back {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: white;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-back:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .cart-button {
+            position: relative;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .cart-icon {
+            width: 24px;
+            height: 24px;
+            filter: brightness(0) invert(1);
+        }
+        
+        .container {
+            padding: 0 1rem;
+            max-width: 100%;
+        }
+        
+        .filters {
+            padding: 1rem 0;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .filters-scroll {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0 1rem;
+            min-width: max-content;
+        }
+        
+        .filter-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: rgba(255,255,255,0.8);
+            padding: 12px 20px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+            min-height: 44px;
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1e1e1e;
+            border-color: #ffd700;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+        
+        .product-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 215, 0, 0.5);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: rgba(255, 215, 0, 0.1);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 3rem;
+        }
+        
+        .product-name {
+            font-size: 1.1rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #ffd700;
+        }
+        
+        .product-description {
+            font-size: 0.9rem;
+            opacity: 0.8;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+        
+        .product-price {
+            font-size: 1rem;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-product-action {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1e1e1e;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-product-action:active {
+            transform: scale(0.95);
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #ffd700;
+        }
+        
+        .d-none {
+            display: none !important;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1>A&A Perfumería</h1>
+        <p>Fragancias inspiradas, creadas con amor</p>
+        
+        <nav class="nav-container">
+            <a href="index.html" class="nav-back">← Inicio</a>
+            <button class="cart-button" onclick="alert('Carrito próximamente')">
+                <img class="cart-icon" src="recursos/A&A/Material Grafico/Carrito_de_compras_Vacio.png" alt="Carrito">
+            </button>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        <!-- Filtros -->
+        <section class="filters">
+            <div class="filters-scroll" id="filtersContainer">
+                <button class="filter-btn active" onclick="loadProducts('todos')">Todos</button>
+                <button class="filter-btn" onclick="loadProducts('caballero')">Caballero</button>
+                <button class="filter-btn" onclick="loadProducts('dama')">Dama</button>
+                <button class="filter-btn" onclick="loadProducts('unisex')">Unisex</button>
+            </div>
+        </section>
+
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            Cargando productos...
+        </div>
+
+        <!-- Grid de Productos -->
+        <section id="productsGrid" class="products-grid">
+            <!-- Los productos se cargarán aquí -->
+        </section>
+
+        <!-- Mensaje de No Productos -->
+        <div id="noProductsMessage" class="d-none">
+            <p style="text-align: center; opacity: 0.7;">No se encontraron productos en esta categoría.</p>
+        </div>
+    </main>
+
+    <script>
+        // Datos de productos simplificados
+        const PRODUCTOS = [
+            {
+                id: 1,
+                nombre: "Perfume Inspirado Caballero 1",
+                descripcion: "Fragancia masculina inspirada en los más populares",
+                categoria: "caballero",
+                precio: 180,
+                emoji: "👨"
+            },
+            {
+                id: 2,
+                nombre: "Perfume Inspirado Dama 1",
+                descripcion: "Fragancia femenina elegante y sofisticada",
+                categoria: "dama",
+                precio: 180,
+                emoji: "👩"
+            },
+            {
+                id: 3,
+                nombre: "Perfume Inspirado Unisex 1",
+                descripcion: "Fragancia versátil para cualquier ocasión",
+                categoria: "unisex",
+                precio: 200,
+                emoji: "💫"
+            },
+            {
+                id: 4,
+                nombre: "Perfume Inspirado Caballero 2",
+                descripcion: "Fragancia fresca y deportiva",
+                categoria: "caballero",
+                precio: 220,
+                emoji: "🏃‍♂️"
+            },
+            {
+                id: 5,
+                nombre: "Perfume Inspirado Dama 2",
+                descripcion: "Fragancia floral y romántica",
+                categoria: "dama",
+                precio: 200,
+                emoji: "🌹"
+            },
+            {
+                id: 6,
+                nombre: "Perfume Inspirado Unisex 2",
+                descripcion: "Fragancia moderna y atrevida",
+                categoria: "unisex",
+                precio: 240,
+                emoji: "⚡"
+            }
+        ];
+        
+        // Variables globales
+        let currentCategory = 'todos';
+        
+        // Función para cargar productos
+        function loadProducts(category) {
+            console.log('Cargando productos para categoría:', category);
+            
+            currentCategory = category;
+            
+            // Actualizar filtros activos
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Mostrar loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('productsGrid').innerHTML = '';
+            document.getElementById('noProductsMessage').classList.add('d-none');
+            
+            // Simular carga
+            setTimeout(() => {
+                renderProducts(category);
+            }, 500);
+        }
+        
+        // Función para renderizar productos
+        function renderProducts(category) {
+            const grid = document.getElementById('productsGrid');
+            const loading = document.getElementById('loading');
+            const noProductsMsg = document.getElementById('noProductsMessage');
+            
+            // Filtrar productos
+            let products = category === 'todos' ? PRODUCTOS : PRODUCTOS.filter(p => p.categoria === category);
+            
+            loading.style.display = 'none';
+            
+            if (products.length === 0) {
+                noProductsMsg.classList.remove('d-none');
+                return;
+            }
+            
+            // Generar HTML
+            const html = products.map(product => `
+                <div class="product-card" onclick="showProductDetails(${product.id})">
+                    <div class="product-image">${product.emoji}</div>
+                    <div class="product-name">${product.nombre}</div>
+                    <div class="product-description">${product.descripcion}</div>
+                    <div class="product-price">Desde $${product.precio}</div>
+                    <button class="btn-product-action" onclick="event.stopPropagation(); showProductDetails(${product.id})">
+                        Ver detalles
+                    </button>
+                </div>
+            `).join('');
+            
+            grid.innerHTML = html;
+            
+            console.log(`${products.length} productos cargados para categoría: ${category}`);
+        }
+        
+        // Función para mostrar detalles del producto
+        function showProductDetails(productId) {
+            const product = PRODUCTOS.find(p => p.id === productId);
+            if (!product) return;
+            
+            alert(`Producto: ${product.nombre}\nPrecio: $${product.precio}\nDescripción: ${product.descripcion}\n\n(Modal completo próximamente)`);
+        }
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('A&A Mobile Fixed - Inicializando...');
+            
+            // Cargar productos iniciales
+            setTimeout(() => {
+                loadProducts('todos');
+            }, 100);
+            
+            console.log('A&A Mobile Fixed - Listo');
+        });
+        
+        // Manejo de errores
+        window.addEventListener('error', (e) => {
+            console.error('Error en A&A Mobile:', e.error);
+            document.getElementById('loading').innerHTML = `
+                <div style="color: #ff4757; text-align: center;">
+                    ❌ Error cargando la aplicación<br>
+                    <small>${e.message}</small>
+                </div>
+            `;
+        });
+        
+        console.log('🛍️ A&A Mobile Fixed cargado correctamente');
+    </script>
+</body>
+</html>

@@ -1,0 +1,334 @@
+/* ===== ESTILOS PARA GOOGLE MAPS ===== */
+
+/* Contenedor del mapa */
+.map-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 2rem auto;
+    padding: 0 1rem;
+}
+
+.map-section {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 20px;
+    padding: 2rem;
+    margin: 2rem 0;
+}
+
+.map-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.map-title {
+    font-size: 2rem;
+    color: #ffd700;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.map-subtitle {
+    color: #ccc;
+    font-size: 1.1rem;
+}
+
+/* Mapa */
+#map {
+    width: 100%;
+    height: 500px;
+    border-radius: 15px;
+    border: 2px solid rgba(255, 215, 0, 0.3);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* Controles del mapa */
+.map-controls {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.map-control-btn {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    color: #1e1e1e;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.map-control-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+}
+
+.map-control-btn:active {
+    transform: translateY(0);
+}
+
+.map-control-btn.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.map-control-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+/* Lista de tiendas */
+.stores-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.store-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 215, 0, 0.2);
+    border-radius: 15px;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.store-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 215, 0, 0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.store-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1rem;
+}
+
+.store-name {
+    font-size: 1.2rem;
+    color: #ffd700;
+    font-weight: bold;
+    margin: 0;
+}
+
+.store-badge {
+    background: linear-gradient(45deg, #ffd700, #ffed4e);
+    color: #1e1e1e;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: bold;
+}
+
+.store-badge.sucursal {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.store-info {
+    color: #ccc;
+    font-size: 0.95rem;
+    line-height: 1.6;
+}
+
+.store-info p {
+    margin: 0.5rem 0;
+    display: flex;
+    align-items: start;
+    gap: 0.5rem;
+}
+
+.store-info strong {
+    color: #ffd700;
+    min-width: 80px;
+}
+
+.store-services {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+
+.service-tag {
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    color: #ffd700;
+    padding: 4px 10px;
+    border-radius: 10px;
+    font-size: 0.85rem;
+}
+
+.store-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.store-action-btn {
+    flex: 1;
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid rgba(255, 215, 0, 0.3);
+    color: #ffd700;
+    padding: 8px 12px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-weight: bold;
+}
+
+.store-action-btn:hover {
+    background: rgba(255, 215, 0, 0.2);
+    transform: translateY(-2px);
+}
+
+/* Info Window personalizada */
+.store-info-window {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.store-info-window h3 {
+    margin: 0 0 0.5rem 0;
+}
+
+.store-info-window p {
+    margin: 0.5rem 0;
+    line-height: 1.5;
+}
+
+.store-info-window button {
+    transition: all 0.3s ease;
+}
+
+.store-info-window button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Loading state */
+.map-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 500px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 15px;
+    border: 2px dashed rgba(255, 215, 0, 0.3);
+}
+
+.map-loading-content {
+    text-align: center;
+}
+
+.map-loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid rgba(255, 215, 0, 0.2);
+    border-top-color: #ffd700;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .map-section {
+        padding: 1.5rem 1rem;
+    }
+    
+    .map-title {
+        font-size: 1.5rem;
+    }
+    
+    .map-subtitle {
+        font-size: 1rem;
+    }
+    
+    #map {
+        height: 400px;
+    }
+    
+    .map-controls {
+        flex-direction: column;
+    }
+    
+    .map-control-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .stores-list {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .store-card {
+        padding: 1rem;
+    }
+    
+    .store-actions {
+        flex-direction: column;
+    }
+    
+    .store-action-btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    #map {
+        height: 350px;
+        border-radius: 10px;
+    }
+    
+    .map-section {
+        padding: 1rem 0.5rem;
+        border-radius: 15px;
+    }
+    
+    .map-title {
+        font-size: 1.3rem;
+    }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.map-section {
+    animation: fadeIn 0.5s ease;
+}
+
+.store-card {
+    animation: fadeIn 0.5s ease;
+    animation-fill-mode: both;
+}
+
+.store-card:nth-child(1) { animation-delay: 0.1s; }
+.store-card:nth-child(2) { animation-delay: 0.2s; }
+.store-card:nth-child(3) { animation-delay: 0.3s; }
+.store-card:nth-child(4) { animation-delay: 0.4s; }

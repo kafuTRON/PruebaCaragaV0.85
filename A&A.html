@@ -1,0 +1,1778 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="theme-color" content="#ffd700">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="A&A Perfumería">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="format-detection" content="telephone=no">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="A&A Perfumería - Fragancias inspiradas en los más populares, creadas con amor">
+    <meta name="keywords" content="perfumes, fragancias, A&A, perfumería, hombre, mujer, unisex">
+    <meta name="author" content="A&A Perfumería - Industrias TKM">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="A&A Perfumería - Catálogo">
+    <meta property="og:description" content="Fragancias inspiradas en los más populares, creadas con amor">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="recursos/A&A/A&A.png">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="css/shared/base.css" as="style">
+    <link rel="preload" href="css/shared/responsive.css" as="style">
+    <link rel="preload" href="js/shared/config.js" as="script">
+    <link rel="preload" href="js/shared/cart-simple.js" as="script">
+    <title>A&A Perfumería - Catálogo</title>
+    
+    <!-- CSS Modular -->
+    <link rel="stylesheet" href="css/shared/base.css">
+    <link rel="stylesheet" href="css/shared/layout.css">
+    <link rel="stylesheet" href="css/shared/components.css">
+    <link rel="stylesheet" href="css/shared/animations.css">
+    <link rel="stylesheet" href="css/shared/modal.css">
+    <link rel="stylesheet" href="css/shared/responsive.css">
+    <link rel="stylesheet" href="css/shared/customer-data.css">
+    <link rel="stylesheet" href="css/shared/search-aa.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Estilos adicionales para modales */
+        .cart-modal, .product-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        
+        .cart-modal.active, .product-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .cart-modal-content, .modal-content {
+            background: linear-gradient(135deg, #1e1e1e 0%, #2d2d2d 100%);
+            border-radius: 25px;
+            padding: 2rem;
+            max-width: 600px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 2px solid rgba(255, 215, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+            transform: scale(0.7);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+        
+        .cart-modal.active .cart-modal-content,
+        .product-modal.active .modal-content {
+            transform: scale(1);
+        }
+        
+        .modal-close, .cart-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: color 0.3s ease;
+            z-index: 10001;
+        }
+        
+        .modal-close:hover, .cart-close:hover {
+            color: #ffd700;
+        }
+        
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.2);
+            padding-bottom: 1rem;
+        }
+        
+        .cart-title {
+            color: #ffd700;
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-15px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.4), 0 0 30px rgba(255,215,0,0.2);
+            border-color: rgba(255,215,0,0.5);
+        }
+        
+        .cart-counter {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: linear-gradient(45deg, #ff4757, #ff6b7a);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border: 2px solid rgba(255,255,255,0.3);
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+        }
+        
+        .cart-counter.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+        
+        /* Estilos para cartelones de novedades */
+        .novedades-container {
+            margin: 2rem 0;
+            opacity: 1;
+            transition: all 0.5s ease;
+        }
+        
+        .novedades-container.hidden {
+            opacity: 0;
+            transform: translateY(-20px);
+            pointer-events: none;
+        }
+        
+        .novedades-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+        
+        .cartelon-item {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,215,0,0.2);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .cartelon-item:hover {
+            transform: translateY(-10px) scale(1.02);
+            border-color: rgba(255,215,0,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 30px rgba(255,215,0,0.2);
+        }
+        
+        .cartelon-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        
+        .cartelon-item:hover .cartelon-image {
+            transform: scale(1.05);
+        }
+        
+        .cartelon-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.8));
+            color: white;
+            padding: 1.5rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .cartelon-item:hover .cartelon-overlay {
+            transform: translateY(0);
+        }
+        
+        .cartelon-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .cartelon-description {
+            font-size: 0.9rem;
+            color: #ccc;
+        }
+        
+        /* Estilos especiales para cartelón de ubicación */
+        .cartelon-ubicacion {
+            border-color: rgba(255, 215, 0, 0.4);
+            background: rgba(255, 215, 0, 0.05);
+        }
+        
+        .cartelon-ubicacion:hover {
+            border-color: rgba(255, 215, 0, 0.8);
+            box-shadow: 0 15px 35px rgba(255, 215, 0, 0.3);
+            transform: translateY(-15px) scale(1.03);
+        }
+        
+        .cartelon-ubicacion-info {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 215, 0, 0.3);
+        }
+        
+        .ubicacion-direcciones {
+            margin-bottom: 15px;
+        }
+        
+        .direccion-item {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.8rem;
+            line-height: 1.3;
+        }
+        
+        .direccion-item strong {
+            color: #ffd700;
+        }
+        
+        .ubicacion-botones {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        
+        .btn-ubicacion {
+            flex: 1;
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #1e1e1e;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 100px;
+        }
+        
+        .btn-ubicacion:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+        }
+        
+        .btn-ubicacion.whatsapp {
+            background: linear-gradient(45deg, #25D366, #20b358);
+            color: white;
+        }
+        
+        .btn-ubicacion.whatsapp:hover {
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+        }
+        
+        .novedades-btn {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 122, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 107, 122, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 122, 0); }
+        }
+        
+        .product-filters {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        /* ===== RESPONSIVE MEJORADO PARA MÓVILES ===== */
+        
+        /* Tablets y móviles grandes (768px - 1024px) */
+        @media (max-width: 1024px) {
+            .main-content {
+                margin: 0 !important;
+            }
+            
+            .side-banners {
+                display: none !important;
+            }
+            
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            
+            .novedades-grid {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 1.5rem;
+            }
+            
+            .cartelon-item {
+                height: 250px;
+            }
+            
+            .cartelon-image {
+                height: 250px;
+            }
+        }
+        
+        /* Móviles grandes (480px - 768px) */
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .header {
+                padding: 1.5rem 0;
+                margin-top: 10px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+                margin-bottom: 0.5rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            /* Filtros móviles */
+            .filters {
+                margin: 1.5rem 0;
+            }
+            
+            .novedades-btn {
+                width: 100%;
+                max-width: 300px;
+                margin: 0 auto 1rem;
+                display: block !important;
+                padding: 12px 24px;
+                font-size: 1rem;
+            }
+            
+            .product-filters {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+                max-width: 400px;
+                margin: 0 auto;
+            }
+            
+            .filter-btn {
+                padding: 12px 16px;
+                font-size: 0.9rem;
+                border-radius: 20px;
+            }
+            
+            /* Cartelones móviles */
+            .novedades-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .cartelon-item {
+                height: 200px;
+                margin: 0 0.5rem;
+            }
+            
+            .cartelon-image {
+                height: 200px;
+            }
+            
+            .cartelon-overlay {
+                padding: 1rem;
+            }
+            
+            .cartelon-title {
+                font-size: 1rem;
+            }
+            
+            .cartelon-description {
+                font-size: 0.8rem;
+            }
+            
+            /* Productos móviles */
+            .products-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin: 1rem 0;
+            }
+            
+            .product-card {
+                margin: 0 0.5rem;
+                border-radius: 15px;
+            }
+            
+            .product-image {
+                height: 200px;
+            }
+            
+            .product-info {
+                padding: 1rem;
+            }
+            
+            .product-name {
+                font-size: 1.2rem;
+            }
+            
+            .product-price {
+                font-size: 1.2rem;
+            }
+            
+            /* Navegación móvil */
+            .nav-back {
+                position: static;
+                display: block;
+                margin: 1rem auto;
+                text-align: center;
+                width: fit-content;
+                padding: 10px 20px;
+                font-size: 0.9rem;
+            }
+            
+            .cart-button {
+                top: 15px;
+                left: 15px;
+                width: 50px;
+                height: 50px;
+            }
+            
+            .cart-icon {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .cart-counter {
+                width: 20px;
+                height: 20px;
+                font-size: 0.7rem;
+                top: -8px;
+                right: -8px;
+            }
+            
+            /* Modales móviles */
+            .cart-modal-content, .modal-content {
+                width: 95%;
+                max-width: none;
+                margin: 1rem;
+                padding: 1.5rem;
+                max-height: 90vh;
+                border-radius: 20px;
+            }
+            
+            .modal-close, .cart-close {
+                top: 10px;
+                right: 15px;
+                font-size: 1.8rem;
+            }
+            
+            .cart-header {
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+            }
+            
+            .cart-title {
+                font-size: 1.5rem;
+            }
+            
+            .modal-product-image {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .modal-product-name {
+                font-size: 1.4rem;
+            }
+            
+            .sizes-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.8rem;
+            }
+            
+            .size-option {
+                padding: 0.8rem;
+            }
+            
+            .size-ml {
+                font-size: 1rem;
+            }
+            
+            .size-price {
+                font-size: 1rem;
+            }
+            
+            .extra-option {
+                padding: 0.8rem;
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .modal-actions, .cart-actions {
+                flex-direction: column;
+                gap: 0.8rem;
+            }
+            
+            .btn-action, .btn-cart-action {
+                width: 100%;
+                padding: 14px 20px;
+                font-size: 1rem;
+            }
+            
+            /* Items del carrito móviles */
+            .cart-item {
+                margin-bottom: 1rem;
+                padding: 1rem;
+                border-radius: 12px;
+            }
+            
+            .cart-item-header {
+                flex-direction: column;
+                gap: 0.8rem;
+                align-items: flex-start;
+            }
+            
+            .cart-item-price {
+                align-self: flex-end;
+                font-size: 1.2rem;
+            }
+            
+            .cart-item-remove {
+                width: 100%;
+                padding: 10px;
+                margin-top: 0.8rem;
+                border-radius: 8px;
+            }
+            
+            .delivery-option {
+                padding: 1rem;
+                border-radius: 12px;
+                flex-direction: column;
+                text-align: center;
+                gap: 0.5rem;
+            }
+            
+            .cart-summary {
+                padding: 1rem;
+                border-radius: 12px;
+            }
+            
+            .cart-summary-row {
+                margin-bottom: 0.8rem;
+                font-size: 0.9rem;
+            }
+            
+            .cart-summary-row.total {
+                font-size: 1.1rem;
+                padding-top: 0.8rem;
+            }
+        }
+        
+        /* Móviles pequeños (menos de 480px) */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 0.8rem;
+            }
+            
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header p {
+                font-size: 0.9rem;
+            }
+            
+            .product-filters {
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
+            }
+            
+            .filter-btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            .cartelon-item, .product-card {
+                margin: 0 0.2rem;
+            }
+            
+            .cartelon-item {
+                height: 180px;
+            }
+            
+            .cartelon-image {
+                height: 180px;
+            }
+            
+            .product-image {
+                height: 180px;
+            }
+            
+            .cart-button {
+                width: 45px;
+                height: 45px;
+            }
+            
+            .cart-icon {
+                width: 25px;
+                height: 25px;
+            }
+            
+            .cart-counter {
+                width: 18px;
+                height: 18px;
+                font-size: 0.6rem;
+            }
+            
+            .cart-modal-content, .modal-content {
+                margin: 0.5rem;
+                padding: 1rem;
+                border-radius: 15px;
+            }
+            
+            .sizes-grid {
+                grid-template-columns: 1fr;
+                gap: 0.6rem;
+            }
+            
+            .size-option, .extra-option {
+                padding: 0.6rem;
+            }
+        }
+        
+        /* Orientación horizontal en móviles */
+        @media (max-height: 500px) and (orientation: landscape) {
+            .header {
+                padding: 1rem 0;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+                margin-bottom: 0.2rem;
+            }
+            
+            .header p {
+                font-size: 0.8rem;
+            }
+            
+            .filters {
+                margin: 1rem 0;
+            }
+            
+            .novedades-grid, .products-grid {
+                margin: 0.5rem 0;
+            }
+            
+            .cartelon-item {
+                height: 150px;
+            }
+            
+            .cartelon-image {
+                height: 150px;
+            }
+            
+            .product-image {
+                height: 150px;
+            }
+            
+            .cart-modal-content, .modal-content {
+                max-height: 85vh;
+                padding: 1rem;
+            }
+        }
+        
+        /* Estilos específicos para dispositivos móviles detectados por JavaScript */
+        .mobile-device .side-banners {
+            display: none !important;
+        }
+        
+        .mobile-device .main-content {
+            margin: 0 !important;
+        }
+        
+        .mobile-device .product-card,
+        .mobile-device .cartelon-item {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .mobile-device .product-card:active,
+        .mobile-device .cartelon-item:active {
+            transform: scale(0.98);
+        }
+        
+        /* Mejoras para PWA en móviles */
+        @media (display-mode: standalone) {
+            .header {
+                padding-top: 2rem; /* Espacio para la barra de estado */
+            }
+            
+            .cart-button {
+                top: 25px; /* Ajustar para modo standalone */
+            }
+        }
+        
+        /* Mejoras para notch en iPhone X y superiores */
+        @supports (padding: max(0px)) {
+            .header {
+                padding-left: max(1rem, env(safe-area-inset-left));
+                padding-right: max(1rem, env(safe-area-inset-right));
+            }
+            
+            .container {
+                padding-left: max(1rem, env(safe-area-inset-left));
+                padding-right: max(1rem, env(safe-area-inset-right));
+            }
+            
+            .cart-button {
+                left: max(15px, env(safe-area-inset-left));
+            }
+            
+            .nav-back {
+                margin-left: max(1rem, env(safe-area-inset-left));
+                margin-right: max(1rem, env(safe-area-inset-right));
+            }
+        }
+        
+        /* Mejoras para dispositivos con densidad de píxeles alta */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .product-image, .cartelon-image {
+                image-rendering: -webkit-optimize-contrast;
+            }
+        }
+        
+        /* Optimizaciones para conexiones lentas */
+        @media (prefers-reduced-data: reduce) {
+            .banner-container::after {
+                display: none; /* Desactivar efectos de brillo */
+            }
+            
+            .product-card, .cartelon-item {
+                box-shadow: none; /* Reducir efectos visuales */
+            }
+            
+            .cart-modal, .product-modal {
+                backdrop-filter: none; /* Desactivar blur */
+                background: rgba(0, 0, 0, 0.95);
+            }
+        }
+        
+        /* Mejoras para pantallas táctiles */
+        @media (hover: none) and (pointer: coarse) {
+            .filter-btn, .btn-contact, .btn-action, .btn-cart-action {
+                min-height: 44px; /* Tamaño mínimo recomendado para toques */
+                -webkit-tap-highlight-color: rgba(255, 215, 0, 0.3);
+            }
+            
+            .cart-button {
+                min-width: 44px;
+                min-height: 44px;
+                -webkit-tap-highlight-color: rgba(255, 215, 0, 0.3);
+            }
+            
+            .cartelon-item:hover .cartelon-overlay {
+                transform: translateY(0); /* Mostrar siempre en móviles */
+            }
+            
+            .product-card:hover {
+                transform: none; /* Desactivar hover en móviles */
+            }
+            
+            /* Feedback táctil mejorado */
+            .filter-btn:active, .btn-contact:active, .btn-action:active, .btn-cart-action:active {
+                transform: scale(0.95);
+                transition: transform 0.1s ease;
+            }
+            
+            .cart-button:active {
+                transform: scale(0.9);
+                transition: transform 0.1s ease;
+            }
+            
+            .cartelon-item:active, .product-card:active {
+                transform: scale(0.98);
+                transition: transform 0.1s ease;
+            }
+            
+            /* Mejorar selección de texto en móviles */
+            .product-name, .cartelon-title {
+                -webkit-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            
+            /* Optimizar scroll en móviles */
+            .cart-modal-content, .modal-content {
+                -webkit-overflow-scrolling: touch;
+            }
+        }
+        
+        /* Optimizaciones de rendimiento para móviles */
+        @media (max-width: 768px) {
+            /* Reducir complejidad visual en móviles */
+            .product-card, .cartelon-item {
+                will-change: transform;
+                backface-visibility: hidden;
+                -webkit-backface-visibility: hidden;
+            }
+            
+            /* Optimizar animaciones para móviles */
+            .cart-counter, .banner-container::after {
+                will-change: transform, opacity;
+            }
+            
+            /* Mejorar rendimiento de imágenes */
+            .product-image, .cartelon-image {
+                image-rendering: -webkit-optimize-contrast;
+                image-rendering: crisp-edges;
+            }
+            
+            /* Reducir blur en móviles para mejor rendimiento */
+            .cart-modal, .product-modal {
+                backdrop-filter: blur(5px);
+            }
+        }
+        
+        /* Mejoras de accesibilidad */
+        @media (max-width: 768px) {
+            /* Focus visible mejorado */
+            .filter-btn:focus, .btn-contact:focus, .btn-action:focus, .btn-cart-action:focus {
+                outline: 3px solid #ffd700;
+                outline-offset: 2px;
+            }
+            
+            .cart-button:focus {
+                outline: 3px solid #ffd700;
+                outline-offset: 2px;
+                border-radius: 50%;
+            }
+            
+            /* Mejorar contraste en móviles */
+            .product-description, .cartelon-description {
+                color: #d0d0d0;
+            }
+            
+            /* Texto más legible en pantallas pequeñas */
+            .product-inspired {
+                color: #e0e0e0;
+            }
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Cartelones Laterales -->
+    <div class="side-banners left" id="leftBanner">
+        <div class="banner-container">
+            <!-- Las imágenes se cargarán dinámicamente -->
+        </div>
+    </div>
+    
+    <div class="side-banners right" id="rightBanner">
+        <div class="banner-container">
+            <!-- Las imágenes se cargarán dinámicamente -->
+        </div>
+    </div>
+
+    <!-- Contenido Principal -->
+    <div class="main-content">
+        <a href="index.html" class="nav-back">← Volver al inicio</a>
+        
+        <!-- Botón del Carrito -->
+        <div class="cart-button" onclick="openCartModal()">
+            <img class="cart-icon" id="cartIcon" src="recursos/A&A/Material Grafico/Carrito_de_compras_Vacio.png" alt="Carrito">
+            <div class="cart-counter" id="cartCounter">0</div>
+        </div>
+        
+        <div class="header">
+            <h1>A&A Perfumería</h1>
+            <p>Fragancias inspiradas en los más populares, creadas con amor</p>
+        </div>
+
+        <!-- Sección de Búsqueda -->
+        <div class="search-section" style="background: #2c2c2c; padding: 20px; margin: 20px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 2px solid #ffd700;">
+            <div class="search-container">
+                <div class="search-bar">
+                    <input type="text" 
+                           id="search-input" 
+                           class="search-input" 
+                           placeholder="Busca tu perfume favorito (ej: Alam, Chanel, hombre)...">
+                    <button id="search-button" class="search-button">
+                        <i class="fas fa-search"></i>
+                        Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+        <!-- Filtros -->
+        <div class="filters">
+            <button class="filter-btn novedades-btn" id="novedadesBtn" onclick="showNovedades()" style="display: none; background: linear-gradient(45deg, #ff6b7a, #ff4757); margin-bottom: 1rem;">🎉 Novedades</button>
+            <div class="product-filters" id="productFilters">
+                <button class="filter-btn active" onclick="filterProducts('todos')">Todos</button>
+                <button class="filter-btn" onclick="filterProducts('hombre')">Hombre</button>
+                <button class="filter-btn" onclick="filterProducts('mujer')">Mujer</button>
+                <button class="filter-btn" onclick="filterProducts('unisex')">Unisex</button>
+            </div>
+        </div>
+
+        <!-- Cartelones de Novedades -->
+        <div class="novedades-container" id="novedadesContainer">
+            <div class="novedades-grid" id="novedadesGrid">
+                <!-- Los cartelones se cargarán aquí con JavaScript -->
+            </div>
+        </div>
+
+        <!-- Resultados de búsqueda -->
+        <div id="search-results" style="display: none;">
+            <!-- Los resultados de búsqueda se mostrarán aquí -->
+        </div>
+
+        <!-- Grid de productos -->
+        <div class="products-grid" id="productsGrid" style="display: none;">
+            <!-- Los productos se cargarán aquí con JavaScript -->
+        </div>
+    </div>
+
+        <div class="footer">
+            <p>© 2025 A&A Perfumería - Industrias TKM | Todos los derechos reservados</p>
+        </div>
+    </div> <!-- Cierre de main-content -->
+
+    <!-- JavaScript Simplificado -->
+    <script src="js/shared/config.js"></script>
+    <script src="js/shared/search-aa.js"></script>
+    <script src="js/shared/customer-data.js"></script>
+    <script src="js/shared/cart-simple.js"></script>
+    <script src="js/shared/simple-music.js"></script>
+    <script>
+        // Datos de los cartelones
+        const cartelones = [
+            {
+                imagen: 'recursos/A&A/Material Grafico/CartelonDamayCabellero.jpg',
+                titulo: 'Fragancias para Dama y Caballero',
+                descripcion: 'Descubre nuestra exclusiva colección de perfumes inspirados en las fragancias más populares del mundo.'
+            },
+            {
+                imagen: 'recursos/A&A/Material Grafico/CartelonDePerdumesInspirados.jpg',
+                titulo: 'Perfumes Inspirados',
+                descripcion: 'Calidad premium a precios accesibles. Cada fragancia es cuidadosamente elaborada para ofrecerte la mejor experiencia.'
+            },
+            {
+                imagen: 'recursos/A&A/Material Grafico/CartelonMarcoPerfume.jpg',
+                titulo: 'Marco de Perfume',
+                descripcion: 'Presentación elegante y sofisticada para cada uno de nuestros productos exclusivos.'
+            },
+            {
+                imagen: 'recursos/A&A/Material Grafico/ParonamaDeLogoConRedesSociales.jpg',
+                titulo: 'Síguenos en Redes Sociales',
+                descripcion: 'Mantente al día con nuestras últimas novedades, promociones y lanzamientos exclusivos.'
+            },
+            {
+                imagen: 'recursos/A&A/Material Grafico/VistaProductoConContactos.jpg',
+                titulo: 'Contacto y Atención',
+                descripción: 'Estamos aquí para ayudarte. Contáctanos por WhatsApp para asesoría personalizada.'
+            },
+            {
+                imagen: 'recursos/A&A/Material Grafico/CartelonDeUbicacionVariante1.jpg',
+                titulo: '📍 Ubícanos',
+                descripcion: 'Visita nuestras sucursales en Orizaba, Veracruz. Te esperamos con los brazos abiertos.',
+                tipo: 'ubicacion',
+                enlace: 'ubicaciones.html'
+            }
+        ];
+
+        // Función para mostrar cartelones de novedades
+        function showNovedades() {
+            const novedadesContainer = document.getElementById('novedadesContainer');
+            const productsGrid = document.getElementById('productsGrid');
+            const novedadesBtn = document.getElementById('novedadesBtn');
+            const productFilters = document.getElementById('productFilters');
+            
+            // Mostrar cartelones y ocultar productos
+            novedadesContainer.style.display = 'block';
+            productsGrid.style.display = 'none';
+            novedadesBtn.style.display = 'none';
+            productFilters.style.display = 'flex';
+            
+            // Resetear botones activos
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            
+            console.log('Mostrando cartelones de novedades');
+        }
+
+        // Función simple para filtrar productos
+        function filterProducts(categoria) {
+            const grid = document.getElementById('productsGrid');
+            const novedadesContainer = document.getElementById('novedadesContainer');
+            const novedadesBtn = document.getElementById('novedadesBtn');
+            const productFilters = document.getElementById('productFilters');
+            
+            let productos = PRODUCTOS;
+            
+            if (categoria !== 'todos') {
+                productos = PRODUCTOS.filter(p => p.categoria === categoria);
+            }
+            
+            // Ocultar cartelones y mostrar productos
+            novedadesContainer.style.display = 'none';
+            grid.style.display = 'grid';
+            novedadesBtn.style.display = 'block';
+            
+            // Actualizar botones activos
+            document.querySelectorAll('.product-filters .filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Renderizar productos
+            grid.innerHTML = productos.map(producto => `
+                <div class="product-card" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 20px; overflow: hidden; transition: all 0.3s ease; opacity: 1; transform: translateY(0);">
+                    <div class="product-image" style="width: 100%; height: 250px; background: linear-gradient(45deg, #333, #555); display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden;">
+                        <img src="${producto.imagen}" alt="${producto.nombre}" style="width: 100%; height: 100%; object-fit: cover;" onload="this.style.opacity='1'" onerror="this.style.display='none'" style="opacity: 0; transition: opacity 0.5s ease;">
+                    </div>
+                    <div class="product-info" style="padding: 1.5rem;">
+                        <div class="product-category" style="display: inline-block; background: rgba(255,215,0,0.2); color: #ffd700; padding: 4px 12px; border-radius: 15px; font-size: 0.8rem; margin-bottom: 1rem;">${producto.categoria.toUpperCase()}</div>
+                        <div class="product-name" style="font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem; color: #ffd700;">${producto.nombre}</div>
+                        <div class="product-inspired" style="font-size: 0.9rem; color: #ccc; margin-bottom: 0.5rem; font-style: italic;">${producto.inspirado}</div>
+                        <div class="product-description" style="font-size: 0.95rem; color: #bbb; margin-bottom: 1rem; line-height: 1.4;">${producto.descripcion}</div>
+                        <div class="product-price" style="font-size: 1.4rem; font-weight: bold; color: #ffd700; margin-bottom: 1rem;">${producto.precio}</div>
+                        <button class="btn-contact" onclick="openProductModal('${producto.nombre}')" style="width: 100%; background: linear-gradient(45deg, #ffd700, #ffed4e); color: #000; border: none; padding: 12px; border-radius: 25px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">
+                            Ver detalles y precios
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+            
+            console.log(`Mostrando ${productos.length} productos de categoría: ${categoria}`);
+        }
+        
+        // Función para renderizar cartelones
+        function renderCartelones() {
+            const novedadesGrid = document.getElementById('novedadesGrid');
+            
+            novedadesGrid.innerHTML = cartelones.map(cartelon => `
+                <div class="cartelon-item ${cartelon.tipo === 'ubicacion' ? 'cartelon-ubicacion' : ''}" 
+                     ${cartelon.enlace ? `onclick="window.open('${cartelon.enlace}', '_blank')" style="cursor: pointer;"` : ''}>
+                    <img src="${cartelon.imagen}" alt="${cartelon.titulo}" class="cartelon-image" onload="this.style.opacity='1'" style="opacity: 0; transition: opacity 0.5s ease;">
+                    <div class="cartelon-overlay">
+                        <div class="cartelon-title">${cartelon.titulo}</div>
+                        <div class="cartelon-description">${cartelon.descripcion}</div>
+                        ${cartelon.tipo === 'ubicacion' ? `
+                            <div class="cartelon-ubicacion-info">
+                                <div class="ubicacion-direcciones">
+                                    <div class="direccion-item">
+                                        <strong>📍 Sucursal Principal:</strong><br>
+                                        Prol. de Nte. 8, UNE, 94310 Orizaba, Ver.
+                                    </div>
+                                    <div class="direccion-item">
+                                        <strong>📍 Sucursal 2:</strong><br>
+                                        Oriente 3, Nte. 10, 94300 Orizaba, Ver.
+                                    </div>
+                                </div>
+                                <div class="ubicacion-botones">
+                                    <button class="btn-ubicacion" onclick="event.stopPropagation(); window.open('ubicaciones.html', '_blank')">
+                                        🗺️ Ver Mapa Completo
+                                    </button>
+                                    <button class="btn-ubicacion whatsapp" onclick="event.stopPropagation(); window.open('https://wa.me/2721224946', '_blank')">
+                                        💬 WhatsApp
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // Función para inicializar cartelones laterales
+        function initializeSideBanners() {
+            const cartelonesList = [
+                'recursos/A&A/Material Grafico/CartelonDamayCabellero.jpg',
+                'recursos/A&A/Material Grafico/CartelonDePerdumesInspirados.jpg',
+                'recursos/A&A/Material Grafico/CartelonMarcoPerfume.jpg',
+                'recursos/A&A/Material Grafico/ParonamaDeLogoConRedesSociales.jpg',
+                'recursos/A&A/Material Grafico/VistaProductoConContactos.jpg',
+                'recursos/A&A/Material Grafico/CartelonDeUbicacionVariante1.jpg',
+                'recursos/A&A/Material Grafico/CartelonDeUbicacionVriante2.jpg',
+                'recursos/A&A/Material Grafico/CartelonDeUbicacionVriante3.jpg'
+            ];
+            
+            const leftContainer = document.querySelector('#leftBanner .banner-container');
+            const rightContainer = document.querySelector('#rightBanner .banner-container');
+            
+            if (!leftContainer || !rightContainer) {
+                console.warn('Contenedores de banner no encontrados');
+                return;
+            }
+            
+            let currentLeftIndex = 0;
+            let currentRightIndex = 1;
+            
+            // Función para crear imagen de banner
+            function createBannerImage(src, isActive = false) {
+                const img = document.createElement('img');
+                img.src = src;
+                img.className = `banner-image ${isActive ? 'active' : ''}`;
+                img.alt = 'Cartelón A&A Perfumería';
+                img.style.cssText = `
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                    border-radius: 15px;
+                    opacity: ${isActive ? '1' : '0'};
+                    transition: opacity 0.5s ease;
+                `;
+                
+                img.onload = function() {
+                    console.log('Banner cargado:', src);
+                };
+                
+                img.onerror = function() {
+                    console.error('Error cargando banner:', src);
+                    this.style.background = 'linear-gradient(45deg, #333, #555)';
+                    this.style.display = 'flex';
+                    this.style.alignItems = 'center';
+                    this.style.justifyContent = 'center';
+                    this.style.color = '#888';
+                    this.textContent = 'A&A';
+                };
+                
+                return img;
+            }
+            
+            // Agregar todas las imágenes a ambos contenedores
+            cartelonesList.forEach((cartelon, index) => {
+                // Cartelón izquierdo
+                const leftImg = createBannerImage(cartelon, index === currentLeftIndex);
+                leftContainer.appendChild(leftImg);
+                
+                // Cartelón derecho
+                const rightImg = createBannerImage(cartelon, index === currentRightIndex);
+                rightContainer.appendChild(rightImg);
+            });
+            
+            // Función para cambiar cartelones
+            function rotateBanners() {
+                // Ocultar cartelones actuales
+                const leftImages = leftContainer.querySelectorAll('.banner-image');
+                const rightImages = rightContainer.querySelectorAll('.banner-image');
+                
+                leftImages[currentLeftIndex].style.opacity = '0';
+                rightImages[currentRightIndex].style.opacity = '0';
+                
+                // Actualizar índices
+                currentLeftIndex = (currentLeftIndex + 1) % cartelonesList.length;
+                currentRightIndex = (currentRightIndex + 1) % cartelonesList.length;
+                
+                // Mostrar nuevos cartelones
+                setTimeout(() => {
+                    leftImages[currentLeftIndex].style.opacity = '1';
+                    rightImages[currentRightIndex].style.opacity = '1';
+                }, 500);
+            }
+            
+            // Iniciar rotación automática cada 8 segundos
+            const rotationInterval = setInterval(rotateBanners, 8000);
+            
+            // Pausar rotación al hacer hover
+            [leftContainer, rightContainer].forEach(container => {
+                container.addEventListener('mouseenter', () => {
+                    clearInterval(rotationInterval);
+                });
+                
+                container.addEventListener('mouseleave', () => {
+                    setInterval(rotateBanners, 8000);
+                });
+            });
+            
+            console.log('Cartelones laterales inicializados');
+        }
+        
+        // ===== OPTIMIZACIONES MÓVILES =====
+        
+        // Detectar si es dispositivo móvil
+        function isMobileDevice() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || 
+                   window.innerWidth <= 768;
+        }
+        
+        // Optimizar imágenes para móviles
+        function optimizeImagesForMobile() {
+            if (!isMobileDevice()) return;
+            
+            const images = document.querySelectorAll('img');
+            images.forEach(img => {
+                // Lazy loading nativo
+                img.loading = 'lazy';
+                
+                // Reducir calidad en móviles si es necesario
+                img.addEventListener('load', function() {
+                    if (this.naturalWidth > 800) {
+                        this.style.imageRendering = 'auto';
+                    }
+                });
+            });
+        }
+        
+        // Mejorar rendimiento de scroll en móviles
+        function optimizeScrollPerformance() {
+            if (!isMobileDevice()) return;
+            
+            let ticking = false;
+            
+            function updateScrollElements() {
+                // Aquí puedes agregar lógica para optimizar elementos durante el scroll
+                ticking = false;
+            }
+            
+            window.addEventListener('scroll', function() {
+                if (!ticking) {
+                    requestAnimationFrame(updateScrollElements);
+                    ticking = true;
+                }
+            }, { passive: true });
+        }
+        
+        // Mejorar gestos táctiles
+        function enhanceTouchInteractions() {
+            if (!isMobileDevice()) return;
+            
+            // Prevenir zoom accidental en inputs
+            const inputs = document.querySelectorAll('input, select, textarea');
+            inputs.forEach(input => {
+                input.addEventListener('focus', function() {
+                    document.querySelector('meta[name=viewport]').setAttribute(
+                        'content', 
+                        'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'
+                    );
+                });
+                
+                input.addEventListener('blur', function() {
+                    document.querySelector('meta[name=viewport]').setAttribute(
+                        'content', 
+                        'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes'
+                    );
+                });
+            });
+            
+            // Mejorar feedback táctil para botones
+            const touchElements = document.querySelectorAll('.filter-btn, .btn-contact, .btn-action, .btn-cart-action, .cart-button');
+            touchElements.forEach(element => {
+                element.addEventListener('touchstart', function() {
+                    this.style.transform = 'scale(0.95)';
+                }, { passive: true });
+                
+                element.addEventListener('touchend', function() {
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                }, { passive: true });
+            });
+        }
+        
+        // Optimizar modales para móviles
+        function optimizeModalsForMobile() {
+            if (!isMobileDevice()) return;
+            
+            // Prevenir scroll del body cuando modal está abierto
+            const originalOpenCartModal = window.openCartModal;
+            const originalOpenProductModal = window.openProductModal;
+            
+            window.openCartModal = function() {
+                originalOpenCartModal.apply(this, arguments);
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${window.scrollY}px`;
+                document.body.style.width = '100%';
+            };
+            
+            window.openProductModal = function() {
+                originalOpenProductModal.apply(this, arguments);
+                document.body.style.position = 'fixed';
+                document.body.style.top = `-${window.scrollY}px`;
+                document.body.style.width = '100%';
+            };
+            
+            // Restaurar scroll al cerrar modales
+            const originalCloseCartModal = window.closeCartModal;
+            const originalCloseProductModal = window.closeProductModal;
+            
+            window.closeCartModal = function() {
+                const scrollY = document.body.style.top;
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                window.scrollTo(0, parseInt(scrollY || '0') * -1);
+                originalCloseCartModal.apply(this, arguments);
+            };
+            
+            window.closeProductModal = function() {
+                const scrollY = document.body.style.top;
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                window.scrollTo(0, parseInt(scrollY || '0') * -1);
+                originalCloseProductModal.apply(this, arguments);
+            };
+        }
+        
+        // Inicializar página
+        document.addEventListener('DOMContentLoaded', function() {
+            // Renderizar cartelones centrales primero
+            renderCartelones();
+            
+            // Inicializar cartelones laterales (solo en desktop)
+            if (!isMobileDevice()) {
+                setTimeout(() => {
+                    initializeSideBanners();
+                }, 1000);
+            }
+            
+            // Aplicar optimizaciones móviles
+            if (isMobileDevice()) {
+                console.log('📱 Dispositivo móvil detectado - Aplicando optimizaciones...');
+                optimizeImagesForMobile();
+                optimizeScrollPerformance();
+                enhanceTouchInteractions();
+                optimizeModalsForMobile();
+                
+                // Agregar clase CSS para móviles
+                document.body.classList.add('mobile-device');
+                
+                // Ocultar cartelones laterales en móviles
+                const sideBanners = document.querySelectorAll('.side-banners');
+                sideBanners.forEach(banner => {
+                    banner.style.display = 'none';
+                });
+                
+                // Ajustar márgenes del contenido principal
+                const mainContent = document.querySelector('.main-content');
+                if (mainContent) {
+                    mainContent.style.margin = '0';
+                }
+            }
+            
+            // Los cartelones se muestran por defecto, productos ocultos
+            console.log('Página inicializada con cartelones de novedades');
+        });
+        
+        // ===== SISTEMA DE AUSENCIA / SCREENSAVER =====
+        let inactivityTimer;
+        let isScreensaverActive = false;
+        let screensaverInterval;
+        let lastActivity = Date.now();
+        const INACTIVITY_TIMEOUT = 60000; // 1 minuto en milisegundos
+        
+        // Función para activar el modo screensaver
+        function activateScreensaver() {
+            if (isScreensaverActive) return;
+            
+            isScreensaverActive = true;
+            console.log('🌙 Activando modo screensaver...');
+            
+            // Crear overlay de screensaver
+            const screensaverOverlay = document.createElement('div');
+            screensaverOverlay.id = 'screensaverOverlay';
+            screensaverOverlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                z-index: 9999;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                opacity: 0;
+                transition: opacity 1s ease;
+                backdrop-filter: blur(5px);
+            `;
+            
+            screensaverOverlay.innerHTML = `
+                <div style="text-align: center; color: white; margin-bottom: 2rem;">
+                    <h1 style="color: #ffd700; font-size: 3rem; margin-bottom: 1rem; text-shadow: 0 0 20px rgba(255,215,0,0.5);">A&A Perfumería</h1>
+                    <p style="font-size: 1.2rem; opacity: 0.8;">Fragancias inspiradas en los más populares</p>
+                    <p style="font-size: 1rem; opacity: 0.6; margin-top: 1rem;">Haz clic en cualquier lugar para continuar</p>
+                </div>
+                <div id="screensaverCarousel" style="width: 80%; max-width: 1200px; height: 400px; position: relative; overflow: hidden; border-radius: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.5);">
+                    <!-- El carrusel se generará aquí -->
+                </div>
+            `;
+            
+            document.body.appendChild(screensaverOverlay);
+            
+            // Mostrar overlay con animación
+            setTimeout(() => {
+                screensaverOverlay.style.opacity = '1';
+            }, 100);
+            
+            // Inicializar carrusel de screensaver
+            initializeScreensaverCarousel();
+            
+            // Agregar evento para desactivar screensaver
+            screensaverOverlay.addEventListener('click', deactivateScreensaver);
+            document.addEventListener('keydown', deactivateScreensaver);
+        }
+        
+        // Función para desactivar el modo screensaver
+        function deactivateScreensaver() {
+            if (!isScreensaverActive) return;
+            
+            isScreensaverActive = false;
+            console.log('☀️ Desactivando modo screensaver...');
+            
+            const overlay = document.getElementById('screensaverOverlay');
+            if (overlay) {
+                overlay.style.opacity = '0';
+                setTimeout(() => {
+                    overlay.remove();
+                }, 1000);
+            }
+            
+            // Limpiar intervalo del carrusel
+            if (screensaverInterval) {
+                clearInterval(screensaverInterval);
+                screensaverInterval = null;
+            }
+            
+            // Remover eventos
+            document.removeEventListener('keydown', deactivateScreensaver);
+            
+            // Reiniciar timer de inactividad
+            resetInactivityTimer();
+        }
+        
+        // Función para inicializar el carrusel del screensaver
+        function initializeScreensaverCarousel() {
+            const carousel = document.getElementById('screensaverCarousel');
+            if (!carousel) return;
+            
+            // Combinar todos los productos y cartelones para el carrusel
+            const allItems = [
+                // Cartelones
+                ...cartelones.map(cartelon => ({
+                    type: 'cartelon',
+                    imagen: cartelon.imagen,
+                    titulo: cartelon.titulo,
+                    descripcion: cartelon.descripcion
+                })),
+                // Productos (si están disponibles)
+                ...(typeof PRODUCTOS !== 'undefined' ? PRODUCTOS.map(producto => ({
+                    type: 'producto',
+                    imagen: producto.imagen,
+                    titulo: producto.nombre,
+                    descripcion: producto.inspirado
+                })) : [])
+            ];
+            
+            let currentIndex = 0;
+            
+            // Crear contenedor del carrusel
+            carousel.innerHTML = `
+                <div id="carouselTrack" style="display: flex; width: ${allItems.length * 100}%; height: 100%; transition: transform 0.8s ease;">
+                    ${allItems.map((item, index) => `
+                        <div class="carousel-slide" style="width: ${100 / allItems.length}%; height: 100%; position: relative; flex-shrink: 0;">
+                            <img src="${item.imagen}" alt="${item.titulo}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.background='linear-gradient(45deg, #333, #555)'; this.style.display='flex'; this.style.alignItems='center'; this.style.justifyContent='center'; this.style.color='#888'; this.textContent='A&A';">
+                            <div style="position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, rgba(0,0,0,0.8)); color: white; padding: 2rem; text-align: center;">
+                                <h3 style="color: #ffd700; font-size: 1.5rem; margin-bottom: 0.5rem;">${item.titulo}</h3>
+                                <p style="opacity: 0.8; font-size: 1rem;">${item.descripcion}</p>
+                                <div style="margin-top: 1rem; padding: 0.5rem 1rem; background: rgba(255,215,0,0.2); border-radius: 20px; display: inline-block; font-size: 0.9rem; color: #ffd700;">
+                                    ${item.type === 'producto' ? '🧴 Perfume' : '🎨 Promoción'}
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <!-- Indicadores -->
+                <div style="position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); display: flex; gap: 10px;">
+                    ${allItems.map((_, index) => `
+                        <div class="carousel-indicator" data-index="${index}" style="width: 12px; height: 12px; border-radius: 50%; background: ${index === 0 ? '#ffd700' : 'rgba(255,255,255,0.3)'}; cursor: pointer; transition: all 0.3s ease;"></div>
+                    `).join('')}
+                </div>
+            `;
+            
+            const track = document.getElementById('carouselTrack');
+            const indicators = carousel.querySelectorAll('.carousel-indicator');
+            
+            // Función para mover el carrusel
+            function moveCarousel() {
+                currentIndex = (currentIndex + 1) % allItems.length;
+                const translateX = -(currentIndex * (100 / allItems.length));
+                track.style.transform = `translateX(${translateX}%)`;
+                
+                // Actualizar indicadores
+                indicators.forEach((indicator, index) => {
+                    indicator.style.background = index === currentIndex ? '#ffd700' : 'rgba(255,255,255,0.3)';
+                });
+            }
+            
+            // Agregar eventos a los indicadores
+            indicators.forEach((indicator, index) => {
+                indicator.addEventListener('click', (e) => {
+                    e.stopPropagation(); // Evitar que se cierre el screensaver
+                    currentIndex = index;
+                    const translateX = -(currentIndex * (100 / allItems.length));
+                    track.style.transform = `translateX(${translateX}%)`;
+                    
+                    // Actualizar indicadores
+                    indicators.forEach((ind, i) => {
+                        ind.style.background = i === currentIndex ? '#ffd700' : 'rgba(255,255,255,0.3)';
+                    });
+                });
+            });
+            
+            // Iniciar carrusel automático cada 4 segundos
+            screensaverInterval = setInterval(moveCarousel, 4000);
+            
+            console.log(`🎠 Carrusel iniciado con ${allItems.length} elementos`);
+        }
+        
+        // Función para reiniciar el timer de inactividad
+        function resetInactivityTimer() {
+            lastActivity = Date.now();
+            
+            if (inactivityTimer) {
+                clearTimeout(inactivityTimer);
+            }
+            
+            if (!isScreensaverActive) {
+                inactivityTimer = setTimeout(activateScreensaver, INACTIVITY_TIMEOUT);
+            }
+        }
+        
+        // Eventos para detectar actividad del usuario
+        const activityEvents = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+        
+        activityEvents.forEach(event => {
+            document.addEventListener(event, resetInactivityTimer, true);
+        });
+        
+        // Inicializar timer de inactividad
+        resetInactivityTimer();
+        
+        console.log('🕐 Sistema de ausencia inicializado (1 minuto de inactividad)');
+        
+        // ===== INICIALIZACIÓN DE MÚSICA DE FONDO SIMPLE =====
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🎵 Sistema de música simple inicializado para A&A Desktop');
+            // El sistema simple se inicializa automáticamente
+            // La música comenzará tras la primera interacción del usuario
+        });
+
+        // ===== INTEGRACIÓN CON SISTEMA DE BÚSQUEDA =====
+        
+        // Función para integrar búsqueda con el sistema existente
+        function integrarBusqueda() {
+            // Esperar a que searchAA esté disponible
+            if (window.searchAA) {
+                console.log('✅ Integrando búsqueda con sistema A&A');
+                
+                // Sobrescribir la función selectProduct para usar el modal existente
+                const originalSelectProduct = window.searchAA.selectProduct;
+                window.searchAA.selectProduct = function(productId) {
+                    const producto = PRODUCTOS.find(p => p.id === productId);
+                    if (producto) {
+                        // Usar la función existente del sistema A&A
+                        if (typeof mostrarModalTamaños === 'function') {
+                            mostrarModalTamaños(producto);
+                        } else {
+                            // Fallback al método original
+                            originalSelectProduct.call(this, productId);
+                        }
+                    }
+                };
+                
+                // Función para mostrar/ocultar secciones según búsqueda
+                window.searchAA.displayResults = function(results, query) {
+                    const searchResults = document.getElementById('search-results');
+                    const productsGrid = document.getElementById('productsGrid');
+                    const filters = document.querySelector('.filters');
+                    const novedadesContainer = document.getElementById('novedadesContainer');
+                    
+                    if (results.length === 0) {
+                        // Mostrar mensaje de no resultados
+                        searchResults.innerHTML = `
+                            <div class="no-results" style="text-align: center; padding: 40px; background: #2c2c2c; border-radius: 12px; margin: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                                <div class="no-results-icon" style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+                                <h3 style="color: #ffd700; margin-bottom: 8px; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">No se encontraron perfumes</h3>
+                                <p style="color: #ccc; margin-bottom: 16px;">No hay perfumes que coincidan con "${query}"</p>
+                                <button onclick="limpiarBusqueda()" class="btn-show-all" style="background: #ffd700; color: #2c2c2c; border: none; padding: 12px 24px; border-radius: 25px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);">
+                                    Ver todos los perfumes
+                                </button>
+                            </div>
+                        `;
+                        searchResults.style.display = 'block';
+                        productsGrid.style.display = 'none';
+                        filters.style.display = 'none';
+                        novedadesContainer.style.display = 'none';
+                        return;
+                    }
+                    
+                    // Mostrar resultados usando el estilo existente
+                    let html = `
+                        <div style="background: #2c2c2c; border-radius: 15px; margin: 20px; padding: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);">
+                            <div class="search-header" style="text-align: center; margin-bottom: 20px; background: linear-gradient(135deg, #3a3a3a 0%, #2c2c2c 100%); padding: 20px; border-radius: 12px; border: 1px solid #555;">
+                                <h3 style="color: #ffd700; margin: 0 0 8px 0; text-shadow: 0 2px 4px rgba(0,0,0,0.3);">Resultados de búsqueda</h3>
+                                <p style="color: #ccc; margin: 0 0 12px 0;">Se encontraron ${results.length} perfume${results.length !== 1 ? 's' : ''} para "${query}"</p>
+                                <button onclick="limpiarBusqueda()" style="background: #ffd700; color: #2c2c2c; border: none; padding: 6px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; cursor: pointer; box-shadow: 0 2px 8px rgba(255, 215, 0, 0.3);">
+                                    Ver todos
+                                </button>
+                            </div>
+                            <div class="products-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;">
+                    `;
+                    
+                    results.forEach(producto => {
+                        html += `
+                            <div class="product-card" style="background: #3a3a3a; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); overflow: hidden; transition: all 0.3s ease; cursor: pointer; border: 2px solid #555;" onclick="mostrarProductoEnCatalogo(${producto.id})">
+                                <div style="position: relative; width: 100%; height: 200px; overflow: hidden; background: linear-gradient(135deg, #fff8dc 0%, #f8f8f8 100%);">
+                                    <img src="${producto.imagen}" alt="${producto.nombre}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='recursos/A&A/placeholder-perfume.jpg'">
+                                    <div style="position: absolute; top: 10px; right: 10px; background: #ffd700; color: #2c2c2c; padding: 4px 8px; border-radius: 12px; font-size: 12px; font-weight: 600;">
+                                        ${producto.categoria === 'hombre' ? '👨 Caballero' : '👩 Dama'}
+                                    </div>
+                                </div>
+                                <div style="padding: 16px;">
+                                    <h4 style="font-size: 18px; font-weight: 700; margin: 0 0 6px 0; color: #ffd700;">${producto.nombre}</h4>
+                                    <p style="color: #ffed4e; font-size: 13px; font-weight: 600; margin: 0 0 8px 0; font-style: italic;">${producto.inspirado}</p>
+                                    <p style="color: #ffd700; font-size: 14px; line-height: 1.4; margin: 0 0 12px 0;">${producto.descripcion}</p>
+                                    <div style="font-size: 16px; font-weight: 700; color: #ffd700; margin-bottom: 12px;">${producto.precio}</div>
+                                    <div style="display: flex; gap: 8px;">
+                                        <button onclick="event.stopPropagation(); openProductModal('${producto.nombre}')" 
+                                                style="flex: 1; background: #ffd700; color: #2c2c2c; border: none; padding: 8px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer;">
+                                            Seleccionar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    
+                    html += '</div></div>';
+                    searchResults.innerHTML = html;
+                    searchResults.style.display = 'block';
+                    productsGrid.style.display = 'none';
+                    filters.style.display = 'none';
+                    novedadesContainer.style.display = 'none';
+                };
+                
+            } else {
+                // Reintentar después de un momento
+                setTimeout(integrarBusqueda, 500);
+            }
+        }
+        
+        // Función para mostrar producto en catálogo
+        function mostrarProductoEnCatalogo(productId) {
+            const producto = PRODUCTOS.find(p => p.id === productId);
+            if (!producto) return;
+            
+            console.log('📍 Mostrando producto en catálogo:', producto.nombre);
+            
+            // Limpiar búsqueda
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) searchInput.value = '';
+            
+            // Ocultar resultados de búsqueda y mostrar catálogo
+            const searchResults = document.getElementById('search-results');
+            const productsGrid = document.getElementById('productsGrid');
+            const filters = document.querySelector('.filters');
+            const novedadesContainer = document.getElementById('novedadesContainer');
+            
+            if (searchResults) searchResults.style.display = 'none';
+            if (productsGrid) productsGrid.style.display = 'grid';
+            if (filters) filters.style.display = 'flex';
+            if (novedadesContainer) novedadesContainer.style.display = 'block';
+            
+            // Mostrar solo este producto en el catálogo
+            if (productsGrid) {
+                productsGrid.innerHTML = `
+                    <div class="product-card featured-product" style="border: 3px solid #ffd700; box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); animation: pulse 2s ease-in-out; position: relative;">
+                        <div style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #ffd700; color: #2c2c2c; padding: 4px 12px; border-radius: 15px; font-size: 12px; font-weight: 700; z-index: 10;">
+                            ⭐ SELECCIONADO
+                        </div>
+                        <div class="product-image">
+                            <img src="${producto.imagen}" alt="${producto.nombre}" onerror="this.src='recursos/A&A/placeholder-perfume.jpg'">
+                            <div class="product-category">${producto.categoria === 'hombre' ? '👨 Caballero' : '👩 Dama'}</div>
+                        </div>
+                        <div class="product-info">
+                            <h4 class="product-name">${producto.nombre}</h4>
+                            <p class="product-inspired">${producto.inspirado}</p>
+                            <p class="product-description">${producto.descripcion}</p>
+                            <div class="product-price">${producto.precio}</div>
+                            <button class="btn-contact" onclick="openProductModal('${producto.nombre}')">
+                                Seleccionar perfume
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Scroll al producto
+                productsGrid.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        // Función para limpiar búsqueda y volver a la vista normal
+        function limpiarBusqueda() {
+            const searchInput = document.getElementById('search-input');
+            const searchResults = document.getElementById('search-results');
+            const productsGrid = document.getElementById('productsGrid');
+            const filters = document.querySelector('.filters');
+            const novedadesContainer = document.getElementById('novedadesContainer');
+            
+            // Limpiar input
+            if (searchInput) searchInput.value = '';
+            
+            // Ocultar resultados de búsqueda
+            if (searchResults) searchResults.style.display = 'none';
+            
+            // Mostrar vista normal
+            if (productsGrid) productsGrid.style.display = 'grid';
+            if (filters) filters.style.display = 'block';
+            if (novedadesContainer) novedadesContainer.style.display = 'block';
+            
+            // Recargar productos si es necesario
+            if (typeof loadProducts === 'function') {
+                loadProducts();
+            }
+        }
+        
+        // Hacer función disponible globalmente
+        window.limpiarBusqueda = limpiarBusqueda;
+        
+        // Inicializar integración cuando todo esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(integrarBusqueda, 1000);
+        });
+
+    </script>
+</body>
+</html>

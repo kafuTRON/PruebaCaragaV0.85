@@ -1,0 +1,308 @@
+/* ===== ANIMATIONS.CSS - Todas las Animaciones ===== */
+
+/* Animaciones de entrada */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(100px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes bounceIn {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.05);
+    }
+    70% {
+        transform: scale(0.9);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Animaciones de filtros */
+.filter-transition {
+    animation: filterSlide var(--transition-slow) ease;
+}
+
+@keyframes filterSlide {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animaciones de carga */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255,215,0,0.3);
+    border-radius: var(--border-radius-full);
+    border-top-color: var(--color-primary);
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { 
+        transform: rotate(360deg); 
+    }
+}
+
+/* Animaciones de partículas */
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255,215,0,0.3);
+    border-radius: var(--border-radius-full);
+    animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px) rotate(0deg);
+        opacity: 0;
+    }
+    50% {
+        transform: translateY(-100px) rotate(180deg);
+        opacity: 1;
+    }
+}
+
+/* Animaciones del carrito */
+.cart-counter.bounce {
+    animation: bounceCounter 0.6s ease;
+}
+
+@keyframes bounceCounter {
+    0% { 
+        transform: scale(1); 
+    }
+    50% { 
+        transform: scale(1.3); 
+    }
+    100% { 
+        transform: scale(1); 
+    }
+}
+
+/* Animaciones de hover para navegación */
+.nav-back:hover {
+    background: rgba(255,215,0,0.2);
+    border-color: rgba(255,215,0,0.5);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-glow);
+}
+
+.cart-button:hover {
+    background: rgba(255,215,0,0.2);
+    border-color: rgba(255,215,0,0.5);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-glow);
+}
+
+/* Animaciones de productos */
+.product-card {
+    animation: fadeInUp 0.6s ease forwards;
+}
+
+/* Animaciones de banners */
+.banner-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    opacity: 0;
+    transition: all 1s ease-in-out;
+    filter: brightness(0.85) contrast(1.1) saturate(1.1);
+    border-radius: var(--border-radius-small);
+}
+
+.banner-image.active {
+    opacity: 1;
+}
+
+.banner-image:hover {
+    filter: brightness(1) contrast(1.2) saturate(1.2);
+    transform: scale(1.03);
+}
+
+/* Overlay gradient para banners */
+.banner-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        135deg,
+        rgba(0,0,0,0.2) 0%,
+        transparent 30%,
+        transparent 70%,
+        rgba(0,0,0,0.2) 100%
+    );
+    z-index: 2;
+    pointer-events: none;
+    border-radius: var(--border-radius-small);
+}
+
+/* Efecto de brillo en banners */
+.banner-container::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+        45deg,
+        transparent 30%,
+        rgba(255,215,0,0.1) 50%,
+        transparent 70%
+    );
+    transform: rotate(45deg);
+    animation: shine 8s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 3;
+}
+
+@keyframes shine {
+    0%, 100% {
+        transform: translateX(-100%) translateY(-100%) rotate(45deg);
+        opacity: 0;
+    }
+    50% {
+        transform: translateX(0%) translateY(0%) rotate(45deg);
+        opacity: 1;
+    }
+}
+
+/* Animación de pulso para disponibilidad */
+.availability-dot {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { 
+        opacity: 1; 
+    }
+    50% { 
+        opacity: 0.5; 
+    }
+}
+
+/* Animaciones de entrada para modales */
+.modal-enter {
+    animation: modalEnter var(--transition-normal) ease forwards;
+}
+
+@keyframes modalEnter {
+    from {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Animaciones de salida para modales */
+.modal-exit {
+    animation: modalExit var(--transition-normal) ease forwards;
+}
+
+@keyframes modalExit {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+    to {
+        opacity: 0;
+        transform: scale(0.7);
+    }
+}
+
+/* Animaciones de notificaciones */
+.notification-enter {
+    animation: notificationSlideIn var(--transition-normal) ease forwards;
+}
+
+@keyframes notificationSlideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification-exit {
+    animation: notificationSlideOut var(--transition-normal) ease forwards;
+}
+
+@keyframes notificationSlideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Animaciones de carga de imágenes */
+.image-loading {
+    background: linear-gradient(90deg, #333 25%, #555 50%, #333 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
